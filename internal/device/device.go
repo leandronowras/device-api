@@ -118,6 +118,17 @@ func (d *Device) ValidateForCreate() error {
 	return nil
 }
 
+// error when conflicts with the current resource state
+// for example, deleting a device that is currently "in-use".
+func ErrConflict(resource, reason string) *DomainError {
+	return &DomainError{
+		Code:    "conflict_" + resource,
+		Field:   resource,
+		Message: reason,
+		HTTP:    http.StatusConflict, // 409
+	}
+}
+
 func (d *Device) ID() string              { return d.id }
 func (d *Device) Name() string            { return d.name }
 func (d *Device) Brand() string           { return d.brand }

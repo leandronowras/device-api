@@ -1,25 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"time"
+	"log"
+	"net/http"
 
-	"github.com/leandronowras/device-api/internal/device"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
+	ih "github.com/leandronowras/device-api/internal/http"
 )
 
 func main() {
-	d, err := device.New("iPhone", "Apple")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "⚠️  Could not create device: %v\n", err)
-		os.Exit(1)
-	}
+	r := chi.NewRouter()
+	r.Use(
+		middleware.RequestID,
+		middleware.RealIP,
+		middleware.Logger,
+		middleware.Recoverer,
+	)
 
-	fmt.Println("Device created successfully!")
-	fmt.Println()
-	fmt.Printf("Name:   %s\n", d.Name())
-	fmt.Printf("Brand:  %s\n", d.Brand())
-	fmt.Printf("ID:     %s\n", d.ID())
-	fmt.Printf("State:  %s\n", d.State())
-	fmt.Printf("Created: %s\n", d.CreationTime().Format(time.RFC822))
+	// Create the in-memory handler (no repository)
+	h := ih.NewHandler()
+
+	r.Route("/v1", func(r chi.Router) {
+		r.Post("/devices", h.CreateDevice)
+		r.Get("/devices", h.ListDevices)
+		r.Get("/devices/{id}", h.GetDevice)
+		r.Patch("/devices/{id}", h.UpdateDevice)
+		r.Delete("/devices/{id}", h.DeleteDevice)
+	})
+
+	addr := ":8080"
+	log.Printf("🚀 Device API running at http://localhost%s/v1/devices", addr)
+	log.Fatal(http.ListenAndServe(addr, r))
 }
