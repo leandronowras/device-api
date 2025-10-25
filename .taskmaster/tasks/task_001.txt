@@ -1,0 +1,27 @@
+# Task ID: 1
+# Title: Feature: Define Device Domain Model
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Introduce canonical Device resource with fields and constraints.
+# Details:
+Given a need to manage devices
+When defining the domain model
+Then the Device entity must have: id (server-generated), name (required), brand (required), state (available|in-use|inactive, default available), creation_time (server-generated, immutable)
+And indexes should exist for brand and state
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 101. Scenario: User can see canonical Device schema in API responses [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given the API is running
+When a client creates or fetches a device
+Then the response body includes id, name, brand, state, creation_time
+And creation_time is an RFC3339 timestamp
+
+

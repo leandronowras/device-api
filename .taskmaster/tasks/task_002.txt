@@ -1,0 +1,45 @@
+# Task ID: 2
+# Title: Feature: Create a new device (POST /v1/devices)
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Allow clients to register a new device with required fields and optional state.
+# Details:
+Given the service accepts POST /v1/devices
+When a valid payload with name, brand (and optional state) is sent
+Then the API persists the device and returns 201 with the resource
+And creation_time is set by the server
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 201. Scenario: User can create a device with default state [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given a JSON body 'name':'X','brand':'Y'}
+When POST /v1/devices
+Then respond 201 with body containing state 'available' and server-generated id and creation_time
+
+
+## 202. Scenario: User cannot create a device with invalid state [pending]
+### Dependencies: None
+### Description: Validation Error
+### Details:
+Given a JSON body with state 'unknown'
+When POST /v1/devices
+Then respond 422 with field_errors for state
+And no device is persisted
+
+
+## 203. Scenario: User can create a device with explicit state [pending]
+### Dependencies: None
+### Description: Alternate Path
+### Details:
+Given a JSON body 'name':'X','brand':'Y','state':'inactive'}
+When POST /v1/devices
+Then respond 201 with state 'inactive'
+
+

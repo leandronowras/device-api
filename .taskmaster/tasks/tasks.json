@@ -1,0 +1,510 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Feature: Define Device Domain Model",
+        "description": "Introduce canonical Device resource with fields and constraints.",
+        "details": "Given a need to manage devices\nWhen defining the domain model\nThen the Device entity must have: id (server-generated), name (required), brand (required), state (available|in-use|inactive, default available), creation_time (server-generated, immutable)\nAnd indexes should exist for brand and state\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 101,
+            "title": "Scenario: User can see canonical Device schema in API responses",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given the API is running\nWhen a client creates or fetches a device\nThen the response body includes id, name, brand, state, creation_time\nAnd creation_time is an RFC3339 timestamp\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Feature: Create a new device (POST /v1/devices)",
+        "description": "Allow clients to register a new device with required fields and optional state.",
+        "details": "Given the service accepts POST /v1/devices\nWhen a valid payload with name, brand (and optional state) is sent\nThen the API persists the device and returns 201 with the resource\nAnd creation_time is set by the server\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 201,
+            "title": "Scenario: User can create a device with default state",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given a JSON body 'name':'X','brand':'Y'}\nWhen POST /v1/devices\nThen respond 201 with body containing state 'available' and server-generated id and creation_time\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 202,
+            "title": "Scenario: User cannot create a device with invalid state",
+            "description": "Validation Error",
+            "dependencies": [],
+            "details": "Given a JSON body with state 'unknown'\nWhen POST /v1/devices\nThen respond 422 with field_errors for state\nAnd no device is persisted\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 203,
+            "title": "Scenario: User can create a device with explicit state",
+            "description": "Alternate Path",
+            "dependencies": [],
+            "details": "Given a JSON body 'name':'X','brand':'Y','state':'inactive'}\nWhen POST /v1/devices\nThen respond 201 with state 'inactive'\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Feature: Fetch a single device (GET /v1/devices/{id})",
+        "description": "Retrieve a device by its id.",
+        "details": "Given an existing device id\nWhen GET /v1/devices/{id}\nThen return 200 with the full resource\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 301,
+            "title": "Scenario: User can fetch an existing device",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given a persisted device with id D1\nWhen GET /v1/devices/D1\nThen respond 200 with the device payload\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 302,
+            "title": "Scenario: User gets 404 for unknown device",
+            "description": "Not Found",
+            "dependencies": [],
+            "details": "Given no device exists with id D404\nWhen GET /v1/devices/D404\nThen respond 404 with a Problem+JSON body\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Feature: List devices with pagination (GET /v1/devices)",
+        "description": "List all devices with keyset pagination and default ordering by creation_time desc.",
+        "details": "Given multiple devices exist\nWhen GET /v1/devices?limit=50\nThen respond 200 with data[] and page.next_cursor when more results exist\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 401,
+            "title": "Scenario: User can list first page of devices",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given at least 2 devices exist\nWhen GET /v1/devices?limit=1\nThen respond 200 with data length 1\nAnd include page.next_cursor not null\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 402,
+            "title": "Scenario: User can fetch next page using cursor",
+            "description": "Happy Path Pagination",
+            "dependencies": [],
+            "details": "Given a valid next_cursor from a prior list call\nWhen GET /v1/devices?cursor={cursor}&limit=1\nThen respond 200 with the next item\nAnd eventually next_cursor is null when no more items\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Feature: Filter devices by brand",
+        "description": "Support brand filtering via query parameter.",
+        "details": "Given devices from multiple brands exist\nWhen GET /v1/devices?brand=Apple\nThen only devices with brand 'Apple' are returned\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 501,
+            "title": "Scenario: User can filter by brand with pagination",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given 3 Apple devices and 2 Samsung devices exist\nWhen GET /v1/devices?brand=Apple&limit=2\nThen respond 200 with only Apple devices and valid next_cursor\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Feature: Filter devices by state",
+        "description": "Support state filtering via query parameter.",
+        "details": "Given devices in different states exist\nWhen GET /v1/devices?state=in-use\nThen only devices with state 'in-use' are returned\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 601,
+            "title": "Scenario: User can filter by state with pagination",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given devices exist in states available, in-use, inactive\nWhen GET /v1/devices?state=inactive&limit=10\nThen respond 200 with only inactive devices and possibly next_cursor\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 602,
+            "title": "Scenario: User gets 422 for invalid state filter",
+            "description": "Validation Error",
+            "dependencies": [],
+            "details": "Given the client sends GET /v1/devices?state=broken\nWhen the request is processed\nThen respond 422 with field_errors for state\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Feature: Fully update a device (PUT /v1/devices/{id})",
+        "description": "Replace mutable fields of a device with domain guards enforced.",
+        "details": "Given a device exists\nWhen PUT /v1/devices/{id} with name, brand, state\nThen update succeeds unless domain rules forbid changes\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 701,
+            "title": "Scenario: User can fully update a non in-use device",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given device D1 is in state 'available'\nWhen PUT /v1/devices/D1 with 'name':'N2','brand':'B2','state':'inactive'}\nThen respond 200 and persist new name, brand, and state\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 702,
+            "title": "Scenario: User cannot change name when device is in-use",
+            "description": "Domain Conflict",
+            "dependencies": [],
+            "details": "Given device D2 is in state 'in-use'\nWhen PUT /v1/devices/D2 with a different name\nThen respond 409 DomainConflict and do not modify the device\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 703,
+            "title": "Scenario: User cannot change brand when device is in-use",
+            "description": "Domain Conflict",
+            "dependencies": [],
+            "details": "Given device D3 is in state 'in-use'\nWhen PUT /v1/devices/D3 with a different brand\nThen respond 409 DomainConflict and do not modify the device\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 704,
+            "title": "Scenario: User cannot set creation_time via PUT",
+            "description": "Immutability",
+            "dependencies": [],
+            "details": "Given device D4 exists\nWhen PUT /v1/devices/D4 and body includes creation_time\nThen server ignores the field or returns 400/422, and persisted creation_time remains unchanged\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 705,
+            "title": "Scenario: User gets 404 when PUT on unknown device",
+            "description": "Not Found",
+            "dependencies": [],
+            "details": "Given no device exists with id D404\nWhen PUT /v1/devices/D404\nThen respond 404 and do not create the device\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Feature: Partially update a device (PATCH /v1/devices/{id})",
+        "description": "Modify a subset of fields with same domain guards as PUT.",
+        "details": "Given a device exists\nWhen PATCH /v1/devices/{id} with any subset of name, brand, state\nThen update succeeds unless domain rules forbid changes\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 801,
+            "title": "Scenario: User can change state to in-use",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given device D5 is available\nWhen PATCH /v1/devices/D5 with {'state':'in-use'}\nThen respond 200 and state becomes in-use\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 802,
+            "title": "Scenario: User cannot change name while device is in-use",
+            "description": "Domain Conflict",
+            "dependencies": [],
+            "details": "Given device D6 is in-use\nWhen PATCH /v1/devices/D6 with 'name':'New'}\nThen respond 409 and name remains unchanged\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 803,
+            "title": "Scenario: User cannot change brand while device is in-use",
+            "description": "Domain Conflict",
+            "dependencies": [],
+            "details": "Given device D7 is in-use\nWhen PATCH /v1/devices/D7 with 'brand':'NewBrand'}\nThen respond 409 and brand remains unchanged\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 804,
+            "title": "Scenario: User cannot update creation_time via PATCH",
+            "description": "Immutability",
+            "dependencies": [],
+            "details": "Given device D8 exists\nWhen PATCH /v1/devices/D8 with 'creation_time':'override'}\nThen respond 400/422 or ignore the field, ensuring creation_time remains unchanged\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 805,
+            "title": "Scenario: User gets 404 when PATCH on unknown device",
+            "description": "Not Found",
+            "dependencies": [],
+            "details": "Given no device exists with id D404\nWhen PATCH /v1/devices/D404\nThen respond 404 and no resource is created\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Feature: Delete a device (DELETE /v1/devices/{id})",
+        "description": "Delete a device with restriction when state is in-use.",
+        "details": "Given a device exists\nWhen DELETE /v1/devices/{id}\nThen deletion succeeds unless device is in-use\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 901,
+            "title": "Scenario: User can delete an inactive device",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given device D9 is inactive\nWhen DELETE /v1/devices/D9\nThen respond 204 and the device no longer exists\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 902,
+            "title": "Scenario: User cannot delete an in-use device",
+            "description": "Domain Conflict",
+            "dependencies": [],
+            "details": "Given device D10 is in-use\nWhen DELETE /v1/devices/D10\nThen respond 409 with detail 'in-use devices cannot be deleted' and device remains\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 903,
+            "title": "Scenario: User receives 204 when deleting a non-existent device (idempotent)",
+            "description": "Idempotent Delete",
+            "dependencies": [],
+            "details": "Given no device exists with id D404\nWhen DELETE /v1/devices/D404\nThen respond 204 and operation is treated as idempotent\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Feature: Enforce domain validations",
+        "description": "Globally enforce immutability of creation_time and guard name/brand when in-use.",
+        "details": "Given any update operation\nWhen creation_time is provided or name/brand is modified while device is in-use\nThen the request is rejected or ignored per API contract and stored values remain consistent\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1001,
+            "title": "Scenario: User cannot update creation_time via PUT or PATCH",
+            "description": "Immutability",
+            "dependencies": [],
+            "details": "Given device D11 exists\nWhen PUT or PATCH includes creation_time different from stored value\nThen respond with 400/422 or ignore the field, leaving creation_time unchanged\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 1002,
+            "title": "Scenario: User cannot change name when state is in-use (both current and target)",
+            "description": "Domain Conflict Edge Case",
+            "dependencies": [],
+            "details": "Given device D12 is in-use\nWhen PATCH attempts {'name':'Altered'}\nThen respond 409 and do not apply the change\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 1003,
+            "title": "Scenario: User can change name after moving from in-use to inactive",
+            "description": "State Transition then Update",
+            "dependencies": [],
+            "details": "Given device D13 is in-use\nWhen PATCH /v1/devices/D13 with 'state':'inactive'} succeeds\nAnd then PATCH /v1/devices/D13 with 'name':'NewName',}\nThen respond 200 and name updates because device is no longer in-use\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Feature: Persistence with non in-memory database",
+        "description": "Use a real database to store devices; include migrations.",
+        "details": "Given the service is deployed\nWhen the API restarts\nThen devices remain persisted in the chosen database and schema migrations can be applied safely\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1101,
+            "title": "Scenario: User can see data persisted across restarts",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given a device exists\nWhen the service restarts\nThen GET /v1/devices/{id} still returns 200 with the device\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 1102,
+            "title": "Scenario: User benefits from indexes for brand/state queries",
+            "description": "Performance",
+            "dependencies": [],
+            "details": "Given many devices exist\nWhen GET /v1/devices?brand=Apple or ?state=in-use\nThen queries execute efficiently leveraging indexes\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Feature: API Documentation (OpenAPI + Docs)",
+        "description": "Expose an OpenAPI 3.1 spec and interactive docs endpoint.",
+        "details": "Given the API is running\nWhen a user visits /openapi.yaml or /docs\nThen the full spec and interactive documentation are available and accurate to the implementation\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1201,
+            "title": "Scenario: User can retrieve OpenAPI specification",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given the service is healthy\nWhen GET /openapi.yaml\nThen respond 200 with a valid OpenAPI 3.1 document\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 1202,
+            "title": "Scenario: User can browse interactive documentation",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given the service is healthy\nWhen GET /docs\nThen respond 200 with an interactive UI showing endpoints, schemas, and examples\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Feature: Health and Readiness Probes",
+        "description": "Expose /healthz and /readyz endpoints for operations.",
+        "details": "Given the platform monitors the service\nWhen it calls /healthz and /readyz\nThen /healthz reports process liveness and /readyz verifies DB connectivity/migrations\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1301,
+            "title": "Scenario: User can check liveness",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given the service process is running\nWhen GET /healthz\nThen respond 200 with a simple OK payload\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 1302,
+            "title": "Scenario: User can check readiness including DB availability",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given the database is reachable and migrations applied\nWhen GET /readyz\nThen respond 200; otherwise respond 503 when checks fail\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Feature: Containerization",
+        "description": "Provide Dockerfile and container image to run the service.",
+        "details": "Given a standard container runtime\nWhen building the image\nThen the service runs as a non-root user and exposes the API on a configurable port\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1401,
+            "title": "Scenario: User can run API via docker-compose with DB",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given docker and docker-compose are installed\nWhen running docker-compose up\nThen the API and database start and CRUD operations succeed end-to-end\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Feature: Reasonable Test Coverage",
+        "description": "Provide unit and integration tests for domain rules, handlers, and persistence.",
+        "details": "Given CI runs the test suite\nWhen tests execute\nThen coverage meets the agreed threshold and critical paths are exercised\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1501,
+            "title": "Scenario: User can run tests locally",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given the repository is cloned\nWhen running the test command\nThen all tests pass and coverage report is generated\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 1502,
+            "title": "Scenario: User sees tests for domain conflict cases",
+            "description": "Domain Rules",
+            "dependencies": [],
+            "details": "Given tests exist\nWhen attempting name/brand change in in-use state\nThen tests assert 409 responses and no data mutation\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Feature: Repository & Delivery",
+        "description": "Deliver as a Git repository with granular commits and clear instructions.",
+        "details": "Given project scaffolding exists\nWhen pushing to remote repository\nThen commits are granular with meaningful messages and the repository omits any prohibited brand references\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1601,
+            "title": "Scenario: User can follow README to run and test",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given a fresh environment with Go 1.23+\nWhen following README steps\nThen the service builds, tests pass, and API endpoints are reachable\n",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 1602,
+            "title": "Scenario: User can export a release artifact",
+            "description": "Distribution",
+            "dependencies": [],
+            "details": "Given the repository contains build scripts\nWhen creating a release\nThen a versioned container image or binary is produced for distribution via email or remote repo\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Feature: Go 1.23+ Compliance",
+        "description": "Ensure the project builds and runs with Go 1.23 or newer.",
+        "details": "Given a machine with Go 1.23+\nWhen running the build command\nThen the application compiles without errors and starts successfully\n",
+        "testStrategy": "",
+        "subtasks": [
+          {
+            "id": 1701,
+            "title": "Scenario: User can compile and run the service",
+            "description": "Happy Path",
+            "dependencies": [],
+            "details": "Given Go 1.23+ is installed\nWhen running go build and executing the binary\nThen the server starts and exposes health endpoints\n",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ]
+  }
+}

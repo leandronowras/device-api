@@ -1,0 +1,25 @@
+# Task ID: 14
+# Title: Feature: Containerization
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Provide Dockerfile and container image to run the service.
+# Details:
+Given a standard container runtime
+When building the image
+Then the service runs as a non-root user and exposes the API on a configurable port
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1401. Scenario: User can run API via docker-compose with DB [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given docker and docker-compose are installed
+When running docker-compose up
+Then the API and database start and CRUD operations succeed end-to-end
+
+

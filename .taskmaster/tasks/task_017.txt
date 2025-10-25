@@ -1,0 +1,25 @@
+# Task ID: 17
+# Title: Feature: Go 1.23+ Compliance
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Ensure the project builds and runs with Go 1.23 or newer.
+# Details:
+Given a machine with Go 1.23+
+When running the build command
+Then the application compiles without errors and starts successfully
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1701. Scenario: User can compile and run the service [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given Go 1.23+ is installed
+When running go build and executing the binary
+Then the server starts and exposes health endpoints
+
+

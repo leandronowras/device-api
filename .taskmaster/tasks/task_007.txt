@@ -1,0 +1,61 @@
+# Task ID: 7
+# Title: Feature: Fully update a device (PUT /v1/devices/{id})
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Replace mutable fields of a device with domain guards enforced.
+# Details:
+Given a device exists
+When PUT /v1/devices/{id} with name, brand, state
+Then update succeeds unless domain rules forbid changes
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 701. Scenario: User can fully update a non in-use device [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given device D1 is in state 'available'
+When PUT /v1/devices/D1 with 'name':'N2','brand':'B2','state':'inactive'}
+Then respond 200 and persist new name, brand, and state
+
+
+## 702. Scenario: User cannot change name when device is in-use [pending]
+### Dependencies: None
+### Description: Domain Conflict
+### Details:
+Given device D2 is in state 'in-use'
+When PUT /v1/devices/D2 with a different name
+Then respond 409 DomainConflict and do not modify the device
+
+
+## 703. Scenario: User cannot change brand when device is in-use [pending]
+### Dependencies: None
+### Description: Domain Conflict
+### Details:
+Given device D3 is in state 'in-use'
+When PUT /v1/devices/D3 with a different brand
+Then respond 409 DomainConflict and do not modify the device
+
+
+## 704. Scenario: User cannot set creation_time via PUT [pending]
+### Dependencies: None
+### Description: Immutability
+### Details:
+Given device D4 exists
+When PUT /v1/devices/D4 and body includes creation_time
+Then server ignores the field or returns 400/422, and persisted creation_time remains unchanged
+
+
+## 705. Scenario: User gets 404 when PUT on unknown device [pending]
+### Dependencies: None
+### Description: Not Found
+### Details:
+Given no device exists with id D404
+When PUT /v1/devices/D404
+Then respond 404 and do not create the device
+
+

@@ -1,0 +1,43 @@
+# Task ID: 9
+# Title: Feature: Delete a device (DELETE /v1/devices/{id})
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Delete a device with restriction when state is in-use.
+# Details:
+Given a device exists
+When DELETE /v1/devices/{id}
+Then deletion succeeds unless device is in-use
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 901. Scenario: User can delete an inactive device [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given device D9 is inactive
+When DELETE /v1/devices/D9
+Then respond 204 and the device no longer exists
+
+
+## 902. Scenario: User cannot delete an in-use device [pending]
+### Dependencies: None
+### Description: Domain Conflict
+### Details:
+Given device D10 is in-use
+When DELETE /v1/devices/D10
+Then respond 409 with detail 'in-use devices cannot be deleted' and device remains
+
+
+## 903. Scenario: User receives 204 when deleting a non-existent device (idempotent) [pending]
+### Dependencies: None
+### Description: Idempotent Delete
+### Details:
+Given no device exists with id D404
+When DELETE /v1/devices/D404
+Then respond 204 and operation is treated as idempotent
+
+

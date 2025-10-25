@@ -1,0 +1,61 @@
+# Task ID: 8
+# Title: Feature: Partially update a device (PATCH /v1/devices/{id})
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Modify a subset of fields with same domain guards as PUT.
+# Details:
+Given a device exists
+When PATCH /v1/devices/{id} with any subset of name, brand, state
+Then update succeeds unless domain rules forbid changes
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 801. Scenario: User can change state to in-use [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given device D5 is available
+When PATCH /v1/devices/D5 with {'state':'in-use'}
+Then respond 200 and state becomes in-use
+
+
+## 802. Scenario: User cannot change name while device is in-use [pending]
+### Dependencies: None
+### Description: Domain Conflict
+### Details:
+Given device D6 is in-use
+When PATCH /v1/devices/D6 with 'name':'New'}
+Then respond 409 and name remains unchanged
+
+
+## 803. Scenario: User cannot change brand while device is in-use [pending]
+### Dependencies: None
+### Description: Domain Conflict
+### Details:
+Given device D7 is in-use
+When PATCH /v1/devices/D7 with 'brand':'NewBrand'}
+Then respond 409 and brand remains unchanged
+
+
+## 804. Scenario: User cannot update creation_time via PATCH [pending]
+### Dependencies: None
+### Description: Immutability
+### Details:
+Given device D8 exists
+When PATCH /v1/devices/D8 with 'creation_time':'override'}
+Then respond 400/422 or ignore the field, ensuring creation_time remains unchanged
+
+
+## 805. Scenario: User gets 404 when PATCH on unknown device [pending]
+### Dependencies: None
+### Description: Not Found
+### Details:
+Given no device exists with id D404
+When PATCH /v1/devices/D404
+Then respond 404 and no resource is created
+
+

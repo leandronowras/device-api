@@ -1,0 +1,44 @@
+# Task ID: 10
+# Title: Feature: Enforce domain validations
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Globally enforce immutability of creation_time and guard name/brand when in-use.
+# Details:
+Given any update operation
+When creation_time is provided or name/brand is modified while device is in-use
+Then the request is rejected or ignored per API contract and stored values remain consistent
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1001. Scenario: User cannot update creation_time via PUT or PATCH [pending]
+### Dependencies: None
+### Description: Immutability
+### Details:
+Given device D11 exists
+When PUT or PATCH includes creation_time different from stored value
+Then respond with 400/422 or ignore the field, leaving creation_time unchanged
+
+
+## 1002. Scenario: User cannot change name when state is in-use (both current and target) [pending]
+### Dependencies: None
+### Description: Domain Conflict Edge Case
+### Details:
+Given device D12 is in-use
+When PATCH attempts {'name':'Altered'}
+Then respond 409 and do not apply the change
+
+
+## 1003. Scenario: User can change name after moving from in-use to inactive [pending]
+### Dependencies: None
+### Description: State Transition then Update
+### Details:
+Given device D13 is in-use
+When PATCH /v1/devices/D13 with 'state':'inactive'} succeeds
+And then PATCH /v1/devices/D13 with 'name':'NewName',}
+Then respond 200 and name updates because device is no longer in-use
+
+

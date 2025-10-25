@@ -1,0 +1,25 @@
+# Task ID: 5
+# Title: Feature: Filter devices by brand
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Support brand filtering via query parameter.
+# Details:
+Given devices from multiple brands exist
+When GET /v1/devices?brand=Apple
+Then only devices with brand 'Apple' are returned
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 501. Scenario: User can filter by brand with pagination [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given 3 Apple devices and 2 Samsung devices exist
+When GET /v1/devices?brand=Apple&limit=2
+Then respond 200 with only Apple devices and valid next_cursor
+
+

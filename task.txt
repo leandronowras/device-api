@@ -1,0 +1,60 @@
+Devices API
+Your task is to develop a REST API capable of persis:ng and managing device resources.
+
+Device Domain
+Id
+Name
+Brand
+State (available, in-use, inac:ve)
+Crea:on :me
+
+Supported Func-onali-es
+Create a new device.
+Fully and/or par:ally update an exis:ng device.
+Fetch a single device.
+Fetch all devices.
+Fetch devices by brand.
+Fetch devices by state.
+Delete a single device.
+
+Domain Valida-ons
+Crea:on :me cannot be updated.
+Name and brand proper:es cannot be updated if the device is in use.
+In use devices cannot be deleted.
+
+Acceptance Criteria
+The applica:on should compile and run successfully.
+The applica:on must contain a reasonable test coverage.
+The API must be documented.
+The applica:on must be capable of persis:ng resources on a database of your choice,
+excluding in-memory.
+The applica:on must be containerized.
+The project must be delivered as a git repository.
+The project includes a README ﬁle with all project related/necessary
+documenta:on/instruc:ons.
+
+Requirements
+Go 1.23+
+
+• Make sure to read all requirements, criteria and evalua:on items before star:ng.
+Try to provide granular changes (e.g. commits) with comments and explana:ons on what is
+being changed.
+Provide addi:onal comments of future improvements and possible missing/malfunc:oning
+parts of your implementa:on.
+If you have ques:ons or any addi:onal informa:on is required, don't hesitate to ask us!
+
+Evalua7on
+The solu:on will be evaluated as per the following criteria:
+
+Implementa:on of all acceptance criteria.
+Usage of well-known best prac:ces and design pa[erns.
+Code eﬃciency and general performance.
+Addi:onal features and produc:on readiness of the overall solu:on.
+
+Final Remarks
+The project can either be delivered directly via email (zip ﬁle), or any remote repository
+provider such as GitHub, GitLab, etc. Just remember the deliverable must be a git repository.
+Make sure no references to the 1GLOBAL brand are present in the project, especially if hosted
+on a public remote repository.
+
+Good Luck!

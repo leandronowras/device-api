@@ -1,0 +1,36 @@
+# Task ID: 4
+# Title: Feature: List devices with pagination (GET /v1/devices)
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: List all devices with keyset pagination and default ordering by creation_time desc.
+# Details:
+Given multiple devices exist
+When GET /v1/devices?limit=50
+Then respond 200 with data[] and page.next_cursor when more results exist
+
+
+# Test Strategy:
+
+
+# Subtasks:
+## 401. Scenario: User can list first page of devices [pending]
+### Dependencies: None
+### Description: Happy Path
+### Details:
+Given at least 2 devices exist
+When GET /v1/devices?limit=1
+Then respond 200 with data length 1
+And include page.next_cursor not null
+
+
+## 402. Scenario: User can fetch next page using cursor [pending]
+### Dependencies: None
+### Description: Happy Path Pagination
+### Details:
+Given a valid next_cursor from a prior list call
+When GET /v1/devices?cursor={cursor}&limit=1
+Then respond 200 with the next item
+And eventually next_cursor is null when no more items
+
+
