@@ -12,6 +12,7 @@ type apiWorld struct {
 	server *httptest.Server
 	resp   *http.Response
 	body   []byte
+	lastID string
 }
 
 func (w *apiWorld) theAPIIsRunning() error {

@@ -29,6 +29,13 @@ Rule:
   @id=3
   ##| 3 | Feature: Fetch a single device (GET /v1/devices/{id}) | pending | medium | None | N/A |
   Scenario: Fetch a single device
+    Given a device exists with name "iPhone" and brand "Apple"
+    When I GET "/devices/{id}"
+    Then the response code should be 200
+    And the response json at "$.name" should be "iPhone"
+    And the response json at "$.brand" should be "Apple"
+    And the response json has keys: "id", "state", "creation_time"
+
 
   @id=4
   ##| 4 | Feature: List devices with pagination (GET /v1/devices) | pending | medium | None | N/A |
