@@ -9,12 +9,12 @@ Rule:
   Creation time cannot be updated.
   Name and brand properties cannot be updated if the device is in use.
   In use devices cannot be deleted.
+  Pagination returns supports page & limit (default page=1, limit=10, max limit=100)
 
   Background:
     Given the API is running reacheable via http
 
   @id=2
-  ##| 2 | Feature: Create a new device (POST /v1/devices) | pending | medium | None | N/A |
   Scenario: Create a new device
     When I POST "/devices" with json:
       """
@@ -27,7 +27,6 @@ Rule:
 
 
   @id=3
-  ##| 3 | Feature: Fetch a single device (GET /v1/devices/{id}) | pending | medium | None | N/A |
   Scenario: Fetch a single device
     Given a device exists with name "iPhone" and brand "Apple"
     When I GET "/devices/{id}"
@@ -38,10 +37,13 @@ Rule:
 
 
   @id=4
-  ##| 4 | Feature: List devices with pagination (GET /v1/devices) | pending | medium | None | N/A |
   Scenario: Fetch all devices  
-    Rule: 
-      Pagination
+    Given the API is running
+    And there are more than 10 devices stored
+    When I GET "/v1/devices?page=1&limit=10"
+    Then the response code should be 200
+    And the response json should contain 10 devices
+    And the response json should include "next_page" and "previous_page" fields
 
   @id=5
   ##| 5 | Feature: Filter devices by brand | pending | medium | None | N/A |

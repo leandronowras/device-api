@@ -3,6 +3,7 @@ package bdd
 import (
 	"context"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/cucumber/godog"
@@ -30,6 +31,22 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	//fetch
 	sc.Step(`^a device exists with name "([^"]*)" and brand "([^"]*)"$`, w.aDeviceExistsWithNameAndBrand)
 	sc.Step(`^I GET "([^"]*)"$`, w.iGET)
+	sc.Step(`^there are more than (\d+) devices stored$`, func(x string) error {
+		n, err := strconv.Atoi(x)
+		if err != nil {
+			return err
+		}
+		return w.thereAreMoreThanDevicesStored(n)
+	})
+	sc.Step(`^the response json should contain (\d+) devices$`, func(x string) error {
+		n, err := strconv.Atoi(x)
+		if err != nil {
+			return err
+		}
+		return w.theResponseJSONShouldContainNDevices(n)
+	})
+	sc.Step(`^the response json should include "next_page" and "previous_page" fields$`, w.theResponseJSONShouldIncludeNextPrev)
+	sc.Step(`^the API is running$`, theAPIIsRunning)
 }
 
 func TestMain(m *testing.M) {

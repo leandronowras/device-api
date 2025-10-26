@@ -51,24 +51,68 @@ func (w *apiWorld) iGET(path string) error {
 	return nil
 }
 
-// And the response json has keys: "id", "state", "creation_time"
-func (w *apiWorld) theResponseJsonHasKeys(k1, k2, k3 string) error {
-	var m map[string]any
-	if err := json.Unmarshal(w.body, &m); err != nil {
-		return fmt.Errorf("invalid json: %w", err)
-	}
-	for _, k := range []string{k1, k2, k3} {
-		if _, ok := m[k]; !ok {
-			return fmt.Errorf("missing key %q", k)
+// Given there are more than {n} devices stored
+func (w *apiWorld) thereAreMoreThanDevicesStored(n int) error {
+	target := n + 1
+	for i := 0; i < target; i++ {
+		payload := fmt.Sprintf(`{ "name": "dev-%d", "brand": "brand-%d" }`, i, i)
+		if err := w.iPOSTWithJSON("/devices", &godog.DocString{Content: payload}); err != nil {
+			return fmt.Errorf("seed POST failed at %d: %w", i, err)
+		}
+		if w.resp == nil || w.resp.StatusCode != 201 {
+			return fmt.Errorf("seed create expected 201, got %d (body=%s)", statusCode(w.resp), string(w.body))
 		}
 	}
 	return nil
 }
 
-// Given the API is running reacheable via http
-func (w *apiWorld) theAPIIsRunningReacheableViaHttp() error {
-	if w == nil || w.server == nil {
-		return fmt.Errorf("test server not initialized")
+// Then the response json should contain {n} devices
+func (w *apiWorld) theResponseJSONShouldContainNDevices(n int) error {
+	var anyJSON any
+	if err := json.Unmarshal(w.body, &anyJSON); err != nil {
+		return fmt.Errorf("invalid json: %w; body=%s", err, string(w.body))
+	}
+
+	switch v := anyJSON.(type) {
+	case []any:
+		if len(v) != n {
+			return fmt.Errorf("expected %d devices in array, got %d", n, len(v))
+		}
+		return nil
+	case map[string]any:
+		// common shape: { "items": [...], "next_page": "...", "previous_page": "..." }
+		items, ok := v["items"].([]any)
+		if !ok {
+			// also allow "data" as a fallback
+			items, ok = v["data"].([]any)
+			if !ok {
+				return fmt.Errorf(`json does not contain an "items" (or "data") array`)
+			}
+		}
+		if len(items) != n {
+			return fmt.Errorf("expected %d devices in items, got %d", n, len(items))
+		}
+		return nil
+	default:
+		return fmt.Errorf("unexpected json root type %T", v)
+	}
+}
+
+// And the response json should include "next_page" and "previous_page" fields
+func (w *apiWorld) theResponseJSONShouldIncludeNextPrev() error {
+	var obj map[string]any
+	if err := json.Unmarshal(w.body, &obj); err != nil {
+		return fmt.Errorf("invalid json: %w; body=%s", err, string(w.body))
+	}
+	if _, ok := obj["next_page"]; !ok {
+		return fmt.Errorf(`missing "next_page" field`)
+	}
+	if _, ok := obj["previous_page"]; !ok {
+		return fmt.Errorf(`missing "previous_page" field`)
 	}
 	return nil
+}
+
+func theAPIIsRunning() error {
+	return godog.ErrPending
 }
