@@ -46,8 +46,15 @@ Rule:
     And the response json should include "next_page" and "previous_page" fields
 
   @id=5
-  ##| 5 | Feature: Filter devices by brand | pending | medium | None | N/A |
   Scenario: Fetch devices by brand  
+    Given the API is running
+    And a device exists with name "iPhone" and brand "Apple"
+    And a device exists with name "Galaxy" and brand "Samsung"
+    When I GET "/v1/devices?brand=Apple"
+    Then the response code should be 200
+    And the response json should contain 1 device
+    And the response json at "$[0].brand" should be "Apple"
+
   @id=6
   ##| 6 | Feature: Filter devices by state | pending | medium | None | N/A |
   Scenario: Fetch devices by state  

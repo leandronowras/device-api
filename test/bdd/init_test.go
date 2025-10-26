@@ -47,6 +47,9 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	})
 	sc.Step(`^the response json should include "next_page" and "previous_page" fields$`, w.theResponseJSONShouldIncludeNextPrev)
 	sc.Step(`^the API is running$`, theAPIIsRunning)
+
+	sc.Step(`^the response json should contain (\d+) device[s]?$`, w.theResponseJSONShouldContainNDevices)
+	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.jsonAtShouldBe)
 }
 
 func TestMain(m *testing.M) {
