@@ -50,6 +50,9 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Step(`^the response json should contain (\d+) device[s]?$`, w.theResponseJSONShouldContainNDevices)
 	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.jsonAtShouldBe)
+
+	sc.Step(`^the response json should contain (\d+) devices$`, w.theResponseJSONShouldContainNDevices)
+	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.responseJsonAtShouldBe)
 }
 
 func TestMain(m *testing.M) {

@@ -5,11 +5,11 @@
 ##  @delete
 ##  @domain_validation
 Feature: http API
-Rule: 
-  Creation time cannot be updated.
-  Name and brand properties cannot be updated if the device is in use.
-  In use devices cannot be deleted.
-  Pagination returns supports page & limit (default page=1, limit=10, max limit=100)
+  Rule: 
+    Creation time cannot be updated.
+    Name and brand properties cannot be updated if the device is in use.
+    In use devices cannot be deleted.
+    Pagination returns supports page & limit (default page=1, limit=10, max limit=100)
 
   Background:
     Given the API is running reacheable via http
@@ -25,7 +25,6 @@ Rule:
     And the response json at "$.brand" should be "Apple"
     And the response json has keys: "id", "state", "creation_time"
 
-
   @id=3
   Scenario: Fetch a single device
     Given a device exists with name "iPhone" and brand "Apple"
@@ -34,7 +33,6 @@ Rule:
     And the response json at "$.name" should be "iPhone"
     And the response json at "$.brand" should be "Apple"
     And the response json has keys: "id", "state", "creation_time"
-
 
   @id=4
   Scenario: Fetch all devices  
@@ -56,8 +54,14 @@ Rule:
     And the response json at "$[0].brand" should be "Apple"
 
   @id=6
-  ##| 6 | Feature: Filter devices by state | pending | medium | None | N/A |
   Scenario: Fetch devices by state  
+    Given the API is running
+    And a device exists with name "iPhone" and brand "Apple"
+    And a device exists with name "Galaxy" and brand "Samsung"
+    When I GET "/v1/devices?state=available"
+    Then the response code should be 200
+    And the response json should contain 2 devices
+    And the response json at "$[0].state" should be "available"
 
   Scenario: Fully and/or partally update an existng device
   Scenario: Delete a single device

@@ -116,3 +116,44 @@ func (w *apiWorld) theResponseJSONShouldIncludeNextPrev() error {
 func theAPIIsRunning() error {
 	return godog.ErrPending
 }
+
+// Then the response json at "{jsonpath}" should be "{expected}"
+func (w *apiWorld) responseJsonAtShouldBe(path, expected string) error {
+	var body any
+	if err := json.Unmarshal(w.body, &body); err != nil {
+		return fmt.Errorf("invalid JSON: %w", err)
+	}
+
+	// Support "$[0].field" and "$.field"
+	if strings.HasPrefix(path, "$[0].") {
+		field := strings.TrimPrefix(path, "$[0].")
+		arr, ok := body.([]any)
+		if !ok || len(arr) == 0 {
+			return fmt.Errorf("expected array at root for %s", path)
+		}
+		obj, ok := arr[0].(map[string]any)
+		if !ok {
+			return fmt.Errorf("array element 0 is not an object")
+		}
+		val := fmt.Sprintf("%v", obj[field])
+		if val != expected {
+			return fmt.Errorf("expected %s=%q, got %q", field, expected, val)
+		}
+		return nil
+	}
+
+	if strings.HasPrefix(path, "$.") {
+		field := strings.TrimPrefix(path, "$.")
+		obj, ok := body.(map[string]any)
+		if !ok {
+			return fmt.Errorf("expected object at root for %s", path)
+		}
+		val := fmt.Sprintf("%v", obj[field])
+		if val != expected {
+			return fmt.Errorf("expected %s=%q, got %q", field, expected, val)
+		}
+		return nil
+	}
+
+	return fmt.Errorf("unsupported JSON path: %s", path)
+}
