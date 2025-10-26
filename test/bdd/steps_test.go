@@ -61,3 +61,11 @@ func (w *apiWorld) jsonHasKeys(keysCSV string) error {
 	}
 	return nil
 }
+
+func theAPIIsRunningReacheableViaHttp() error {
+	return godog.ErrPending
+}
+
+func theResponseJsonHasKeys(arg1, arg2, arg3 string) error {
+	return godog.ErrPending
+}
