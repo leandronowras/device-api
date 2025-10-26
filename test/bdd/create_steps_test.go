@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/cucumber/godog"
 )
@@ -44,20 +43,6 @@ func (w *apiWorld) jsonAtShouldBe(path, expected string) error {
 	}
 	if fmt.Sprint(got) != expected {
 		return fmt.Errorf(`json at %s: want %q, got %q`, path, expected, fmt.Sprint(got))
-	}
-	return nil
-}
-
-func (w *apiWorld) jsonHasKeys(keysCSV string) error {
-	var m map[string]any
-	if err := json.Unmarshal(w.body, &m); err != nil {
-		return fmt.Errorf("invalid json: %w", err)
-	}
-	for _, k := range strings.Split(keysCSV, ",") {
-		k = strings.TrimSpace(k)
-		if _, ok := m[k]; !ok {
-			return fmt.Errorf("missing key %q", k)
-		}
 	}
 	return nil
 }

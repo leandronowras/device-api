@@ -5,10 +5,10 @@
 ##  @delete
 ##  @domain_validation
 Feature: http API
-  Rule: 
-    Creation time cannot be updated.
-    Name and brand properties cannot be updated if the device is in use.
-    In use devices cannot be deleted.
+Rule: 
+  Creation time cannot be updated.
+  Name and brand properties cannot be updated if the device is in use.
+  In use devices cannot be deleted.
 
   Background:
     Given the API is running reacheable via http
