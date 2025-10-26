@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": "1",
+        "id": 1,
         "title": "Feature: Define Device Domain Model",
         "description": "Introduce canonical Device resource with fields and constraints.",
         "details": "Given a need to manage devices\nWhen defining the domain model\nThen the Device entity must have: id (server-generated), name (required), brand (required), state (available|in-use|inactive, default available), creation_time (server-generated, immutable)\nAnd indexes should exist for brand and state\n",
@@ -24,7 +24,7 @@
         "dependencies": []
       },
       {
-        "id": "2",
+        "id": 2,
         "title": "Feature: Create a new device (POST /v1/devices)",
         "description": "Allow clients to register a new device with required fields and optional state.",
         "details": "Given the service accepts POST /v1/devices\nWhen a valid payload with name, brand (and optional state) is sent\nThen the API persists the device and returns 201 with the resource\nAnd creation_time is set by the server\n",
@@ -64,7 +64,7 @@
         "dependencies": []
       },
       {
-        "id": "3",
+        "id": 3,
         "title": "Feature: Fetch a single device (GET /v1/devices/{id})",
         "description": "Retrieve a device by its id.",
         "details": "Given an existing device id\nWhen GET /v1/devices/{id}\nThen return 200 with the full resource\n",
@@ -94,7 +94,7 @@
         "dependencies": []
       },
       {
-        "id": "4",
+        "id": 4,
         "title": "Feature: List devices with pagination (GET /v1/devices)",
         "description": "List all devices with keyset pagination and default ordering by creation_time desc.",
         "details": "Given multiple devices exist\nWhen GET /v1/devices?limit=50\nThen respond 200 with data[] and page.next_cursor when more results exist\n",
@@ -124,7 +124,7 @@
         "dependencies": []
       },
       {
-        "id": "5",
+        "id": 5,
         "title": "Feature: Filter devices by brand",
         "description": "Support brand filtering via query parameter.",
         "details": "Given devices from multiple brands exist\nWhen GET /v1/devices?brand=Apple\nThen only devices with brand 'Apple' are returned\n",
@@ -144,7 +144,7 @@
         "dependencies": []
       },
       {
-        "id": "6",
+        "id": 6,
         "title": "Feature: Filter devices by state",
         "description": "Support state filtering via query parameter.",
         "details": "Given devices in different states exist\nWhen GET /v1/devices?state=in-use\nThen only devices with state 'in-use' are returned\n",
@@ -174,7 +174,7 @@
         "dependencies": []
       },
       {
-        "id": "7",
+        "id": 7,
         "title": "Feature: Fully update a device (PUT /v1/devices/{id})",
         "description": "Replace mutable fields of a device with domain guards enforced.",
         "details": "Given a device exists\nWhen PUT /v1/devices/{id} with name, brand, state\nThen update succeeds unless domain rules forbid changes\n",
@@ -234,7 +234,7 @@
         "dependencies": []
       },
       {
-        "id": "8",
+        "id": 8,
         "title": "Feature: Partially update a device (PATCH /v1/devices/{id})",
         "description": "Modify a subset of fields with same domain guards as PUT.",
         "details": "Given a device exists\nWhen PATCH /v1/devices/{id} with any subset of name, brand, state\nThen update succeeds unless domain rules forbid changes\n",
@@ -294,7 +294,7 @@
         "dependencies": []
       },
       {
-        "id": "9",
+        "id": 9,
         "title": "Feature: Delete a device (DELETE /v1/devices/{id})",
         "description": "Delete a device with restriction when state is in-use.",
         "details": "Given a device exists\nWhen DELETE /v1/devices/{id}\nThen deletion succeeds unless device is in-use\n",
@@ -334,7 +334,7 @@
         "dependencies": []
       },
       {
-        "id": "10",
+        "id": 10,
         "title": "Feature: Enforce domain validations",
         "description": "Globally enforce immutability of creation_time and guard name/brand when in-use.",
         "details": "Given any update operation\nWhen creation_time is provided or name/brand is modified while device is in-use\nThen the request is rejected or ignored per API contract and stored values remain consistent\n",
@@ -376,7 +376,7 @@
         "updatedAt": "2025-10-25T20:07:35.430Z"
       },
       {
-        "id": "11",
+        "id": 11,
         "title": "Feature: Persistence with non in-memory database",
         "description": "Use a real database to store devices; include migrations.",
         "details": "Given the service is deployed\nWhen the API restarts\nThen devices remain persisted in the chosen database and schema migrations can be applied safely\n",
@@ -406,7 +406,7 @@
         "dependencies": []
       },
       {
-        "id": "12",
+        "id": 12,
         "title": "Feature: API Documentation (OpenAPI + Docs)",
         "description": "Expose an OpenAPI 3.1 spec and interactive docs endpoint.",
         "details": "Given the API is running\nWhen a user visits /openapi.yaml or /docs\nThen the full spec and interactive documentation are available and accurate to the implementation\n",
@@ -436,7 +436,7 @@
         "dependencies": []
       },
       {
-        "id": "13",
+        "id": 13,
         "title": "Feature: Health and Readiness Probes",
         "description": "Expose /healthz and /readyz endpoints for operations.",
         "details": "Given the platform monitors the service\nWhen it calls /healthz and /readyz\nThen /healthz reports process liveness and /readyz verifies DB connectivity/migrations\n",
@@ -466,7 +466,7 @@
         "dependencies": []
       },
       {
-        "id": "14",
+        "id": 14,
         "title": "Feature: Containerization",
         "description": "Provide Dockerfile and container image to run the service.",
         "details": "Given a standard container runtime\nWhen building the image\nThen the service runs as a non-root user and exposes the API on a configurable port\n",
@@ -481,12 +481,21 @@
             "status": "pending",
             "testStrategy": "",
             "parentId": "undefined"
+          },
+          {
+            "id": 1402,
+            "title": "dagger",
+            "description": "",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
           }
         ],
         "dependencies": []
       },
       {
-        "id": "15",
+        "id": 15,
         "title": "Feature: Reasonable Test Coverage",
         "description": "Provide unit and integration tests for domain rules, handlers, and persistence.",
         "details": "Given CI runs the test suite\nWhen tests execute\nThen coverage meets the agreed threshold and critical paths are exercised\n",
@@ -516,7 +525,7 @@
         "dependencies": []
       },
       {
-        "id": "16",
+        "id": 16,
         "title": "Feature: Repository & Delivery",
         "description": "Deliver as a Git repository with granular commits and clear instructions.",
         "details": "Given project scaffolding exists\nWhen pushing to remote repository\nThen commits are granular with meaningful messages and the repository omits any prohibited brand references\n",
@@ -546,7 +555,7 @@
         "dependencies": []
       },
       {
-        "id": "17",
+        "id": 17,
         "title": "Feature: Go 1.23+ Compliance",
         "description": "Ensure the project builds and runs with Go 1.23 or newer.",
         "details": "Given a machine with Go 1.23+\nWhen running the build command\nThen the application compiles without errors and starts successfully\n",
@@ -573,7 +582,9 @@
       "completedCount": 2,
       "tags": [
         "master"
-      ]
+      ],
+      "created": "2025-10-26T11:11:19.418Z",
+      "description": "Tasks for master context"
     }
   }
 }
