@@ -39,7 +39,6 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 		return ctx, nil
 	})
 
-	sc.Step(`^the API is running reacheable via http$`, theAPIIsRunningReacheableViaHttp)
 	sc.Step(`^I POST "([^"]*)" with json:$`, w.iPOSTWithJSON)
 	sc.Step(`^the response code should be (\d+)$`, w.theResponseCodeShouldBe)
 	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.jsonAtShouldBe)
@@ -70,6 +69,7 @@ func TestMain(m *testing.M) {
 		Output: colors.Colored(os.Stdout),
 		Format: "pretty",
 		Paths:  []string{"features"},
+		Strict: true,
 	}
 	code := godog.TestSuite{
 		Name:                "devices",

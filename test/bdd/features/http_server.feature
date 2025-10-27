@@ -11,8 +11,8 @@ Feature: http API
     In use devices cannot be deleted.
     Pagination returns supports page & limit (default page=1, limit=10, max limit=100)
 
-  Background:
-    Given the API is running reacheable via http
+    #Background:
+    #  Given the API is running reacheable via http
 
   @id=2
   Scenario: Create a new device
