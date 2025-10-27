@@ -63,8 +63,22 @@ Feature: http API
     And the response json should contain 2 devices
     And the response json at "$[0].state" should be "available"
 
+  @id=7
   Scenario: Fully and/or partally update an existng device
+    Given a device exists with name "iPhone" and brand "Apple"
+    When I PATCH "/v1/devices/{id}" with json:
+      """
+      { "name": "iPhone 15" }
+      """
+    Then the response code should be 200
+    And the response json at "$.name" should be "iPhone 15"
+    And the response json at "$.brand" should be "Apple"
+
+  @id=8
   Scenario: Delete a single device
+    Given a device exists with name "iPhone" and brand "Apple"
+    When I DELETE "/v1/devices/{id}"
+    Then the response code should be 204
 
 ##| 7 | Feature: Fully update a device (PUT /v1/devices/{id}) | pending | medium | None | N/A |
 ##| 8 | Feature: Partially update a device (PATCH /v1/devices/{id}) | pending | medium | None | N/A |

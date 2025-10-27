@@ -40,6 +40,8 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	})
 
 	sc.Step(`^I POST "([^"]*)" with json:$`, w.iPOSTWithJSON)
+	sc.Step(`^I PATCH "([^"]*)" with json:$`, w.iPATCHWithJSON)
+	sc.Step(`^I DELETE "([^"]*)"$`, w.iDELETE)
 	sc.Step(`^the response code should be (\d+)$`, w.theResponseCodeShouldBe)
 	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.responseJsonAtShouldBe)
 	sc.Step(`^the response json has keys: "([^"]*)", "([^"]*)", "([^"]*)"$`, w.theResponseJsonHasKeys)
