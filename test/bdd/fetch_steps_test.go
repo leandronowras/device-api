@@ -56,7 +56,7 @@ func (w *apiWorld) thereAreMoreThanDevicesStored(n int) error {
 	target := n + 1
 	for i := 0; i < target; i++ {
 		payload := fmt.Sprintf(`{ "name": "dev-%d", "brand": "brand-%d" }`, i, i)
-		if err := w.iPOSTWithJSON("/devices", &godog.DocString{Content: payload}); err != nil {
+		if err := w.iPOSTWithJSON("/v1/devices", &godog.DocString{Content: payload}); err != nil {
 			return fmt.Errorf("seed POST failed at %d: %w", i, err)
 		}
 		if w.resp == nil || w.resp.StatusCode != 201 {
