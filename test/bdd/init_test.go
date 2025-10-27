@@ -41,8 +41,8 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Step(`^I POST "([^"]*)" with json:$`, w.iPOSTWithJSON)
 	sc.Step(`^the response code should be (\d+)$`, w.theResponseCodeShouldBe)
-	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.jsonAtShouldBe)
-	sc.Step(`^the response json has keys: "([^"]*)", "([^"]*)", "([^"]*)"$`, theResponseJsonHasKeys)
+	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.responseJsonAtShouldBe)
+	sc.Step(`^the response json has keys: "([^"]*)", "([^"]*)", "([^"]*)"$`, w.theResponseJsonHasKeys)
 
 	sc.Step(`^a device exists with name "([^"]*)" and brand "([^"]*)"$`, w.aDeviceExistsWithNameAndBrand)
 	sc.Step(`^I GET "([^"]*)"$`, w.iGET)
@@ -53,15 +53,9 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 		}
 		return w.thereAreMoreThanDevicesStored(n)
 	})
-	sc.Step(`^the response json should contain (\d+) devices$`, func(x string) error {
-		n, err := strconv.Atoi(x)
-		if err != nil {
-			return err
-		}
-		return w.theResponseJSONShouldContainNDevices(n)
-	})
 	sc.Step(`^the response json should include "next_page" and "previous_page" fields$`, w.theResponseJSONShouldIncludeNextPrev)
 	sc.Step(`^the API is running$`, theAPIIsRunning)
+	sc.Step(`^the response json should contain (\d+) device[s]?$`, w.theResponseJSONShouldContainNDevices)
 }
 
 func TestMain(m *testing.M) {

@@ -17,8 +17,8 @@ type apiWorld struct {
 
 func (w *apiWorld) theAPIIsRunning() error {
 	r := chi.NewRouter()
-
 	h := ih.NewHandler()
+
 	r.Route("/v1", func(r chi.Router) {
 		r.Post("/devices", h.CreateDevice)
 		r.Get("/devices", h.ListDevices)
