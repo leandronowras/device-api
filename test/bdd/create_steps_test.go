@@ -48,9 +48,18 @@ func (w *apiWorld) jsonAtShouldBe(path, expected string) error {
 }
 
 func theAPIIsRunningReacheableViaHttp() error {
-	return godog.ErrPending
+	return nil
 }
 
-func theResponseJsonHasKeys(arg1, arg2, arg3 string) error {
-	return godog.ErrPending
+func (w *apiWorld) theResponseJsonHasKeys(key1, key2, key3 string) error {
+	var m map[string]any
+	if err := json.Unmarshal(w.body, &m); err != nil {
+		return fmt.Errorf("invalid json: %w", err)
+	}
+	for _, key := range []string{key1, key2, key3} {
+		if _, ok := m[key]; !ok {
+			return fmt.Errorf("missing key %q", key)
+		}
+	}
+	return nil
 }
