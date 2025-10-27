@@ -1,11 +1,11 @@
 package bdd
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 
 	"github.com/go-chi/chi/v5"
+	ih "github.com/leandronowras/device-api/internal/http"
 )
 
 type apiWorld struct {
@@ -16,27 +16,15 @@ type apiWorld struct {
 }
 
 func (w *apiWorld) theAPIIsRunning() error {
-	// Minimal router for testing
 	r := chi.NewRouter()
 
-	r.Post("/devices", func(wr http.ResponseWriter, r *http.Request) {
-		var in struct {
-			Name  string `json:"name"`
-			Brand string `json:"brand"`
-		}
-		_ = json.NewDecoder(r.Body).Decode(&in)
-
-		out := map[string]any{
-			"id":            "123",
-			"name":          in.Name,
-			"brand":         in.Brand,
-			"state":         "available",
-			"creation_time": "2025-10-26T00:00:00Z",
-		}
-
-		wr.Header().Set("Content-Type", "application/json")
-		wr.WriteHeader(http.StatusCreated)
-		_ = json.NewEncoder(wr).Encode(out)
+	h := ih.NewHandler()
+	r.Route("/v1", func(r chi.Router) {
+		r.Post("/devices", h.CreateDevice)
+		r.Get("/devices", h.ListDevices)
+		r.Get("/devices/{id}", h.GetDevice)
+		r.Patch("/devices/{id}", h.UpdateDevice)
+		r.Delete("/devices/{id}", h.DeleteDevice)
 	})
 
 	w.server = httptest.NewServer(r)
