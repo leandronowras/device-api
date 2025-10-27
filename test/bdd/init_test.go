@@ -14,21 +14,37 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	w := &apiWorld{}
 
 	sc.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
+		// Defensive cleanup in case a previous scenario failed mid-flight
+		if w.resp != nil && w.resp.Body != nil {
+			_ = w.resp.Body.Close()
+		}
+		// Reset per-scenario world state
+		w.resp = nil
+		w.body = nil
+		w.lastID = ""
+
+		// Ensure no old server is dangling, then start a fresh one
+		w.stopServer()
 		return ctx, w.theAPIIsRunning()
 	})
+
 	sc.After(func(ctx context.Context, _ *godog.Scenario, _ error) (context.Context, error) {
+		if w.resp != nil && w.resp.Body != nil {
+			_ = w.resp.Body.Close()
+		}
 		w.stopServer()
+		w.resp = nil
+		w.body = nil
+		w.lastID = ""
 		return ctx, nil
 	})
 
-	//create
 	sc.Step(`^the API is running reacheable via http$`, theAPIIsRunningReacheableViaHttp)
 	sc.Step(`^I POST "([^"]*)" with json:$`, w.iPOSTWithJSON)
 	sc.Step(`^the response code should be (\d+)$`, w.theResponseCodeShouldBe)
 	sc.Step(`^the response json at "([^"]*)" should be "([^"]*)"$`, w.responseJsonAtShouldBe)
 	sc.Step(`^the response json has keys: "([^"]*)", "([^"]*)", "([^"]*)"$`, w.theResponseJsonHasKeys)
 
-	//fetch
 	sc.Step(`^a device exists with name "([^"]*)" and brand "([^"]*)"$`, w.aDeviceExistsWithNameAndBrand)
 	sc.Step(`^I GET "([^"]*)"$`, w.iGET)
 	sc.Step(`^there are more than (\d+) devices stored$`, func(x string) error {
