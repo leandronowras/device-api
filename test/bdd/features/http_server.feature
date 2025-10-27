@@ -16,7 +16,7 @@ Feature: http API
 
   @id=2
   Scenario: Create a new device
-    When I POST "/devices" with json:
+    When I POST "/v1/devices" with json:
       """
       { "name": "iPhone", "brand": "Apple" }
       """
@@ -28,7 +28,7 @@ Feature: http API
   @id=3
   Scenario: Fetch a single device
     Given a device exists with name "iPhone" and brand "Apple"
-    When I GET "/devices/{id}"
+    When I GET "/v1/devices/{id}"
     Then the response code should be 200
     And the response json at "$.name" should be "iPhone"
     And the response json at "$.brand" should be "Apple"
