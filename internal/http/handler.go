@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"strconv"
 	"strings"
 	"time"
 
@@ -92,6 +93,8 @@ func (h *Handler) GetDevice(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 func (h *Handler) ListDevices(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 	brand := strings.TrimSpace(r.URL.Query().Get("brand"))
 	state := strings.TrimSpace(r.URL.Query().Get("state"))
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
 
 	resp := []deviceResponse{}
 	for _, d := range h.devices {
@@ -103,6 +106,57 @@ func (h *Handler) ListDevices(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 		}
 		resp = append(resp, toResp(d))
 	}
+
+	if pageStr != "" || limitStr != "" {
+		page := 1
+		if pageStr != "" {
+			if p, err := strconv.ParseInt(pageStr, 10, 64); err == nil && p > 0 {
+				page = int(p)
+			}
+		}
+		
+		limit := 10
+		if limitStr != "" {
+			if l, err := strconv.ParseInt(limitStr, 10, 64); err == nil && l > 0 {
+				limit = int(l)
+				if limit > 100 {
+					limit = 100
+				}
+			}
+		}
+
+		total := len(resp)
+		start := (page - 1) * limit
+		end := start + limit
+
+		if start >= total {
+			start = total
+		}
+		if end > total {
+			end = total
+		}
+
+		paged := resp[start:end]
+		
+		nextPage := ""
+		if end < total {
+			nextPage = strconv.FormatInt(int64(page+1), 10)
+		}
+		
+		prevPage := ""
+		if page > 1 {
+			prevPage = strconv.FormatInt(int64(page-1), 10)
+		}
+
+		envelope := map[string]any{
+			"items":         paged,
+			"next_page":     nextPage,
+			"previous_page": prevPage,
+		}
+		writeJSON(w, stdhttp.StatusOK, envelope)
+		return
+	}
+
 	writeJSON(w, stdhttp.StatusOK, resp)
 }
 
