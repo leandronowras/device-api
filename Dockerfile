@@ -1,14 +1,14 @@
 # =============================================================================
 # Builder stage: Compile Go application with CGO enabled for DuckDB
 # =============================================================================
-FROM golang:1.25.1-alpine AS builder
+FROM golang:1.25-bookworm AS builder
 
 # Install build dependencies for CGO and DuckDB
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     ca-certificates \
     git \
-    build-base \
-    musl-dev
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
 
@@ -26,22 +26,22 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
     go build -ldflags="-s -w" -o /out/device-api ./cmd/app
 
 # =============================================================================
-# Runtime stage: Minimal Alpine image with runtime dependencies only
+# Runtime stage: Minimal Debian image with runtime dependencies only
 # =============================================================================
-FROM alpine:latest
+FROM debian:bookworm-slim
 
 # Install runtime dependencies
 # - ca-certificates: for HTTPS connections
-# - libstdc++/libgcc: required by DuckDB
+# - libstdc++6: required by DuckDB
 # - curl: for health checks
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libstdc++ \
-    libgcc \
-    curl
+    libstdc++6 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user and group for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 WORKDIR /app
 
