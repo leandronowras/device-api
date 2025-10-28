@@ -481,7 +481,9 @@
             "parentId": "undefined"
           }
         ],
-        "dependencies": []
+        "dependencies": [],
+        "status": "cancelled",
+        "updatedAt": "2025-10-28T10:32:07.705Z"
       },
       {
         "id": "14",
@@ -575,7 +577,9 @@
             "parentId": "undefined"
           }
         ],
-        "dependencies": []
+        "dependencies": [],
+        "status": "done",
+        "updatedAt": "2025-10-28T17:05:15.572Z"
       },
       {
         "id": "17",
@@ -602,9 +606,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-28T01:13:17.782Z",
+      "lastModified": "2025-10-28T17:05:15.578Z",
       "taskCount": 17,
-      "completedCount": 14,
+      "completedCount": 15,
       "tags": [
         "master"
       ]
