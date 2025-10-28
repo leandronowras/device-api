@@ -22,7 +22,8 @@ COPY . .
 # Build the application with optimizations
 # - CGO_ENABLED=1: Required for go-duckdb driver
 # - ldflags="-s -w": Strip debug info to reduce binary size
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
+# Note: GOOS/GOARCH removed to support native architecture (ARM64 or AMD64)
+RUN CGO_ENABLED=1 \
     go build -ldflags="-s -w" -o /out/device-api ./cmd/app
 
 # =============================================================================
