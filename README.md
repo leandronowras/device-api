@@ -77,16 +77,14 @@ Database: `./devices.db` (DuckDB)
 
 Port: `8080`
 
+## Task status
 
 <!-- TASKMASTER_EXPORT_START -->
-> 🎯 **Taskmaster Export** - 2025-10-28 17:05:36 UTC
-> 📋 Export: without subtasks • Status filter: none
-> 🔗 Powered by [Task Master](https://task-master.dev?utm_source=github-readme&utm_medium=readme-export&utm_campaign=one-global&utm_content=task-export-link)
 
 | Project Dashboard |  |
 | :-                |:-|
-| Task Progress     | ██████████████████░░ 88% |
-| Done | 15 |
+| Task Progress     | ███████████████████░ 94% |
+| Done | 16 |
 | In Progress | 0 |
 | Pending | 0 |
 | Deferred | 0 |
@@ -95,7 +93,7 @@ Port: `8080`
 | Subtask Progress | ░░░░░░░░░░░░░░░░░░░░ 0% |
 | Completed | 0 |
 | In Progress | 0 |
-| Pending | 40 |
+| Pending | 0 |
 
 
 | ID | Title | Status | Priority | Dependencies | Complexity |
@@ -111,14 +109,13 @@ Port: `8080`
 | 9 | Feature: Delete a device (DELETE /v1/devices/{id}) | ✓&nbsp;done | medium | None | N/A |
 | 10 | Feature: Enforce domain validations | ✓&nbsp;done | medium | None | N/A |
 | 11 | Feature: Persistence with non in-memory database | ✓&nbsp;done | medium | None | N/A |
-| 12 | Feature: API Documentation (OpenAPI + Docs) | pending | medium | None | N/A |
+| 12 | Feature: API Documentation (OpenAPI + Docs) | ✓&nbsp;done | medium | None | N/A |
 | 13 | Feature: Health and Readiness Probes | x&nbsp;cancelled | medium | None | N/A |
 | 14 | Feature: Containerization | ✓&nbsp;done | medium | None | N/A |
 | 15 | Feature: Reasonable Test Coverage | ✓&nbsp;done | medium | None | N/A |
 | 16 | Feature: Repository & Delivery | ✓&nbsp;done | medium | None | N/A |
 | 17 | Feature: Go 1.23+ Compliance | ✓&nbsp;done | medium | None | N/A |
 
-> 📋 **End of Taskmaster Export** - Tasks are synced from your project using the `sync-readme` command.
 <!-- TASKMASTER_EXPORT_END -->
 
 
