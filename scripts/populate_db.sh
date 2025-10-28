@@ -29,7 +29,7 @@ devices=(
 count=0
 for device in "${devices[@]}"; do
   if curl -sf -X POST "$API_URL" -H "Content-Type: application/json" -d "$device" > /dev/null; then
-    ((count++))
+    count=$((count + 1))
     echo "✓ Created device $count"
   else
     echo "✗ Failed to create device"

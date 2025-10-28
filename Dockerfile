@@ -33,11 +33,13 @@ FROM debian:bookworm-slim
 # Install runtime dependencies
 # - ca-certificates: for HTTPS connections
 # - libstdc++6: required by DuckDB
-# - curl: for health checks
+# - curl: for health checks and scripts
+# - jq: for JSON processing in scripts
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libstdc++6 \
     curl \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user and group for security
@@ -47,6 +49,9 @@ WORKDIR /app
 
 # Copy compiled binary from builder stage
 COPY --from=builder /out/device-api /app/device-api
+
+# Copy scripts folder
+COPY scripts /app/scripts
 
 # Create data directory for persistent storage and symlink for backward compatibility
 # The app expects ./devices.db, but we store it in /data for volume mounting
