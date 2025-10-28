@@ -1,0 +1,60 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDEs and editors
+.vscode/
+.idea/
+.devcontainer/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files and directories
+**/*_test.go
+test/
+tests/
+**/testdata/
+coverage/
+*.coverprofile
+
+# Build artifacts
+dist/
+build/
+bin/
+tmp/
+out/
+
+# Database files (will be created at runtime in volume)
+*.db
+*.db.wal
+*.db-shm
+*.db-journal
+
+# Environment and configuration
+.env
+.env.local
+.env.*.local
+.env.example
+
+# Documentation
+README.md
+WARP.md
+docs/
+documentation/
+*.md
+
+# Task management
+.taskmaster/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.circleci/
+
+# Docker files (no need to copy into image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore

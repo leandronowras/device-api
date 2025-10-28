@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  device-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: device-api:latest
+    container_name: device-api
+    ports:
+      - "8080:8080"
+    volumes:
+      # Persistent volume for DuckDB database
+      - device_data:/data
+    restart: unless-stopped
+    environment:
+      # Uncomment and modify as needed
+      # PORT: "8080"
+      # DEVICE_DB_PATH: "/data/devices.db"
+      # LOG_LEVEL: "info"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/v1/devices || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    # Optional: Resource limits for production
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 512M
+    #     reservations:
+    #       cpus: '0.25'
+    #       memory: 128M
+
+volumes:
+  device_data:
+    driver: local
