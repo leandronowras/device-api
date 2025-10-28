@@ -13,6 +13,10 @@ node_modules/
 # Environment variables
 .env
 
+# Database files
+*.db
+*.db.wal
+
 # Editor directories and files
 .idea
 .vscode

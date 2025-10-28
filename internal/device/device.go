@@ -61,6 +61,30 @@ func New(name, brand string, stateOptional ...string) (*Device, error) {
 	}, nil
 }
 
+func NewWithID(id, name, brand, state string, creationTime time.Time) (*Device, error) {
+	name = strings.TrimSpace(name)
+	brand = strings.TrimSpace(brand)
+	state = strings.ToLower(strings.TrimSpace(state))
+
+	if name == "" {
+		return nil, ErrRequired("name")
+	}
+	if brand == "" {
+		return nil, ErrRequired("brand")
+	}
+	if !isValidState(state) {
+		return nil, ErrInvalid("state", "state must be one of: available, in-use, inactive", http.StatusBadRequest)
+	}
+
+	return &Device{
+		id:            id,
+		name:          name,
+		brand:         brand,
+		state:         state,
+		creation_time: creationTime,
+	}, nil
+}
+
 // Stub to keep this snippet standalone; swap with "github.com/google/uuid".
 func uuidNewString() (string, error) {
 	u, err := uuid.NewRandom()
@@ -134,3 +158,30 @@ func (d *Device) Name() string            { return d.name }
 func (d *Device) Brand() string           { return d.brand }
 func (d *Device) State() string           { return d.state }
 func (d *Device) CreationTime() time.Time { return d.creation_time }
+
+func (d *Device) SetName(name string) error {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return ErrRequired("name")
+	}
+	d.name = name
+	return nil
+}
+
+func (d *Device) SetBrand(brand string) error {
+	brand = strings.TrimSpace(brand)
+	if brand == "" {
+		return ErrRequired("brand")
+	}
+	d.brand = brand
+	return nil
+}
+
+func (d *Device) SetState(state string) error {
+	state = strings.ToLower(strings.TrimSpace(state))
+	if !isValidState(state) {
+		return ErrInvalid("state", "state must be one of: available, in-use, inactive", http.StatusBadRequest)
+	}
+	d.state = state
+	return nil
+}

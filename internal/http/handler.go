@@ -1,6 +1,8 @@
 package http
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"strconv"
@@ -11,14 +13,15 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/leandronowras/device-api/internal/device"
+	"github.com/leandronowras/device-api/internal/repository"
 )
 
 type Handler struct {
-	devices map[string]*device.Device
+	repo repository.DeviceRepository
 }
 
-func NewHandler() *Handler {
-	return &Handler{devices: make(map[string]*device.Device)}
+func NewHandler(repo repository.DeviceRepository) *Handler {
+	return &Handler{repo: repo}
 }
 
 // Shared response struct
@@ -70,19 +73,27 @@ func (h *Handler) CreateDevice(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 		return
 	}
 
-	h.devices[d.ID()] = d
-	writeJSON(w, stdhttp.StatusCreated, toResp(d))
+	saved, err := h.repo.Save(context.Background(), d)
+	if err != nil {
+		writeJSONError(w, err)
+		return
+	}
+	writeJSON(w, stdhttp.StatusCreated, toResp(saved))
 }
 
 // --- READ (GET by ID) --------------------------------------------------------
 
 func (h *Handler) GetDevice(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 	id := chi.URLParam(r, "id")
-	d, ok := h.devices[id]
-	if !ok {
+	d, err := h.repo.FindByID(context.Background(), id)
+	if errors.Is(err, sql.ErrNoRows) {
 		writeJSONError(w, &device.DomainError{
 			Code: "not_found", Field: "id", Message: "device not found", HTTP: stdhttp.StatusNotFound,
 		})
+		return
+	}
+	if err != nil {
+		writeJSONError(w, err)
 		return
 	}
 	writeJSON(w, stdhttp.StatusOK, toResp(d))
@@ -96,14 +107,22 @@ func (h *Handler) ListDevices(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 	pageStr := r.URL.Query().Get("page")
 	limitStr := r.URL.Query().Get("limit")
 
+	var bPtr, sPtr *string
+	if brand != "" {
+		bPtr = &brand
+	}
+	if state != "" {
+		sPtr = &state
+	}
+
+	list, err := h.repo.FindAll(context.Background(), bPtr, sPtr)
+	if err != nil {
+		writeJSONError(w, err)
+		return
+	}
+
 	resp := []deviceResponse{}
-	for _, d := range h.devices {
-		if brand != "" && !strings.EqualFold(brand, d.Brand()) {
-			continue
-		}
-		if state != "" && !strings.EqualFold(state, d.State()) {
-			continue
-		}
+	for _, d := range list {
 		resp = append(resp, toResp(d))
 	}
 
@@ -164,11 +183,15 @@ func (h *Handler) ListDevices(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 
 func (h *Handler) UpdateDevice(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 	id := chi.URLParam(r, "id")
-	d, ok := h.devices[id]
-	if !ok {
+	d, err := h.repo.FindByID(context.Background(), id)
+	if errors.Is(err, sql.ErrNoRows) {
 		writeJSONError(w, &device.DomainError{
 			Code: "not_found", Field: "id", Message: "device not found", HTTP: stdhttp.StatusNotFound,
 		})
+		return
+	}
+	if err != nil {
+		writeJSONError(w, err)
 		return
 	}
 
@@ -192,43 +215,45 @@ func (h *Handler) UpdateDevice(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 
 	// Apply updates if provided
 	if req.Name != nil && strings.TrimSpace(*req.Name) != "" {
-		newD, err := device.New(*req.Name, d.Brand(), d.State())
-		if err != nil {
+		if err := d.SetName(*req.Name); err != nil {
 			writeJSONError(w, err)
 			return
 		}
-		*d = *newD // overwrite
 	}
 	if req.Brand != nil && strings.TrimSpace(*req.Brand) != "" {
-		newD, err := device.New(d.Name(), *req.Brand, d.State())
-		if err != nil {
+		if err := d.SetBrand(*req.Brand); err != nil {
 			writeJSONError(w, err)
 			return
 		}
-		*d = *newD
 	}
 	if req.State != nil && strings.TrimSpace(*req.State) != "" {
-		newD, err := device.New(d.Name(), d.Brand(), *req.State)
-		if err != nil {
+		if err := d.SetState(*req.State); err != nil {
 			writeJSONError(w, err)
 			return
 		}
-		*d = *newD
 	}
 
-	h.devices[id] = d
-	writeJSON(w, stdhttp.StatusOK, toResp(d))
+	updated, err := h.repo.Update(context.Background(), d)
+	if err != nil {
+		writeJSONError(w, err)
+		return
+	}
+	writeJSON(w, stdhttp.StatusOK, toResp(updated))
 }
 
 // --- DELETE ------------------------------------------------------------------
 
 func (h *Handler) DeleteDevice(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 	id := chi.URLParam(r, "id")
-	d, ok := h.devices[id]
-	if !ok {
+	d, err := h.repo.FindByID(context.Background(), id)
+	if errors.Is(err, sql.ErrNoRows) {
 		writeJSONError(w, &device.DomainError{
 			Code: "not_found", Field: "id", Message: "device not found", HTTP: stdhttp.StatusNotFound,
 		})
+		return
+	}
+	if err != nil {
+		writeJSONError(w, err)
 		return
 	}
 
@@ -237,7 +262,10 @@ func (h *Handler) DeleteDevice(w stdhttp.ResponseWriter, r *stdhttp.Request) {
 		return
 	}
 
-	delete(h.devices, id)
+	if err := h.repo.Delete(context.Background(), id); err != nil {
+		writeJSONError(w, err)
+		return
+	}
 	w.WriteHeader(stdhttp.StatusNoContent)
 }
 

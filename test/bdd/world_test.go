@@ -1,11 +1,15 @@
 package bdd
 
 import (
+	"database/sql"
 	"net/http"
 	"net/http/httptest"
 
 	"github.com/go-chi/chi/v5"
+	_ "github.com/marcboeker/go-duckdb"
+
 	ih "github.com/leandronowras/device-api/internal/http"
+	duckdbrepo "github.com/leandronowras/device-api/internal/repository/duckdb"
 )
 
 type apiWorld struct {
@@ -13,11 +17,20 @@ type apiWorld struct {
 	resp   *http.Response
 	body   []byte
 	lastID string
+	db     *sql.DB
 }
 
 func (w *apiWorld) theAPIIsRunning() error {
+	db, err := sql.Open("duckdb", "")
+	if err != nil {
+		return err
+	}
+	w.db = db
+
+	repo := duckdbrepo.NewDeviceRepository(db)
+
 	r := chi.NewRouter()
-	h := ih.NewHandler()
+	h := ih.NewHandler(repo)
 
 	r.Route("/v1", func(r chi.Router) {
 		r.Post("/devices", h.CreateDevice)
@@ -34,5 +47,8 @@ func (w *apiWorld) theAPIIsRunning() error {
 func (w *apiWorld) stopServer() {
 	if w.server != nil {
 		w.server.Close()
+	}
+	if w.db != nil {
+		w.db.Close()
 	}
 }
