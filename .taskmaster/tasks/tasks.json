@@ -511,7 +511,9 @@
             "parentId": "undefined"
           }
         ],
-        "dependencies": []
+        "dependencies": [],
+        "status": "done",
+        "updatedAt": "2025-10-28T01:13:17.781Z"
       },
       {
         "id": "15",
@@ -600,9 +602,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-28T00:58:40.758Z",
+      "lastModified": "2025-10-28T01:13:17.782Z",
       "taskCount": 17,
-      "completedCount": 13,
+      "completedCount": 14,
       "tags": [
         "master"
       ]
